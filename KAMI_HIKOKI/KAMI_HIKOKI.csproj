@@ -1,13 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{CE0126A9-F1E9-4F1B-84D5-DA67D3BD3FF6}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>KAMI_HIKOKI</RootNamespace>
     <AssemblyName>KAMI_HIKOKI</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -26,6 +29,9 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Program.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -38,38 +44,23 @@
     <Compile Include="GameMgr.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="Altseed">
-      <HintPath>Altseed.dll</HintPath>
+    <Reference Include="Altseed, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\AltseedDotNet.1.1.0.2\lib\net45\Altseed.dll</HintPath>
+      <Private>True</Private>
     </Reference>
+    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="bin\.DS_Store" />
-    <None Include="bin\Debug\.DS_Store" />
-    <None Include="bin\Debug\Altseed.dll" />
-    <None Include="bin\Debug\Altseed.xml" />
-    <None Include="bin\Debug\Altseed_core.dll" />
-    <None Include="bin\Debug\KAMI_HIKOKI.exe" />
-    <None Include="bin\Debug\KAMI_HIKOKI.pdb" />
-    <None Include="bin\Debug\Log.html" />
-    <None Include="bin\Debug\libAltseed_core.dylib" />
-    <None Include="bin\Debug\Resource\.DS_Store" />
-    <None Include="bin\Debug\Resource\Image\.DS_Store" />
-    <None Include="bin\Debug\Resource\Image\Airplane.png" />
-    <None Include="bin\Debug\Resource\Image\BackGround.png" />
-    <None Include="bin\Debug\Resource\Image\Cloud_L.png" />
-    <None Include="bin\Debug\Resource\Image\Cloud_M.png" />
-    <None Include="bin\Debug\Resource\Image\Cloud_S.png" />
-    <None Include="bin\Debug\Resource\Image\Rain.png" />
-    <None Include="bin\Debug\Resource\Image\Wall.png" />
-    <None Include="bin\Debug\Resource\MapData\Map.csv" />
-    <None Include="Altseed.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="libAltseed_core.dylib">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Altseed.XML" />
+    <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\AltseedDotNet.1.1.0.2\build\net45\AltseedDotNet.targets" Condition="Exists('..\packages\AltseedDotNet.1.1.0.2\build\net45\AltseedDotNet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\AltseedDotNet.1.1.0.2\build\net45\AltseedDotNet.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\AltseedDotNet.1.1.0.2\build\net45\AltseedDotNet.targets'))" />
+  </Target>
 </Project>
