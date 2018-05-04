@@ -9,6 +9,7 @@ namespace KAMI_HIKOKI
         [STAThread]
         static void Main(string[] args)
         {
+            
             //初期化
             if (!Init())
             {

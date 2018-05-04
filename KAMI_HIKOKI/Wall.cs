@@ -3,7 +3,7 @@ namespace KAMI_HIKOKI
 {
     public class Wall : asd.TextureObject2D
     {
-        static asd.Texture2D TextureOfWall;
+        public static asd.Texture2D TextureOfWall;
 
         //共通初期化
         public static bool Init()

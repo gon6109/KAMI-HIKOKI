@@ -4,12 +4,15 @@ namespace KAMI_HIKOKI
     public class Player : asd.TextureObject2D
     {
         float speed;
+        float acceleration;
         int hp;
+        public readonly int MaxHP;
 
         //プロパティ
         asd.Joystick Joystick { set; get; }//ジョイスティック
         asd.CircleShape ShapeOfCollige { set; get; }//衝突判定
-        public readonly int MaxHP;
+        public float MinSpeed { set; get; }//最低スピード
+        public float MaxSpeed { set; get; }//最高スピード
 
         //HP
         public int HP 
@@ -36,9 +39,13 @@ namespace KAMI_HIKOKI
         {
             set
             {
-                if (value < 2.0f)
+                if (value < MinSpeed)
                 {
-                    speed = 2.0f;
+                    speed = MinSpeed;
+                }
+                else if (value > MaxSpeed)
+                {
+                    speed = MaxSpeed;
                 }
                 else
                 {
@@ -51,6 +58,30 @@ namespace KAMI_HIKOKI
             }
         }
 
+        //加速度
+        public float Acceleration
+        {
+            set
+            {
+                if (value < -1.0f)
+                {
+                    acceleration = -1.0f;
+                }
+                else if (value > 1.0f)
+                {
+                    acceleration = 1.0f;
+                }
+                else
+                {
+                    acceleration = value;
+                }
+            }
+            get
+            {
+                return acceleration;
+            }
+        }
+
         public Player()
         {
             Texture = asd.Engine.Graphics.CreateTexture2D("./Resource/Image/Airplane.png");
@@ -58,7 +89,9 @@ namespace KAMI_HIKOKI
 
             Joystick = asd.Engine.JoystickContainer.GetJoystickAt(0);
 
-            Speed = 5.0f;
+            MaxSpeed = 6.0f;
+            MinSpeed = 2.0f;
+            Speed = 4.0f;
             Position = new asd.Vector2DF(-30.0f, 240.0f);
 
             ShapeOfCollige = new asd.CircleShape();
@@ -72,22 +105,36 @@ namespace KAMI_HIKOKI
         protected override void OnUpdate()
         {
             //前に進む
+            asd.Vector2DF velocity = new asd.Vector2DF(Speed, 0.1f);
             Position += new asd.Vector2DF(Speed, 0.1f);
 
             //上昇・下降
-            Position += new asd.Vector2DF(0.0f, Joystick.GetAxisState(1) * 3.0f);
+            Position += new asd.Vector2DF(0.0f, Joystick.GetAxisState(1) * 4.0f);
+            velocity += new asd.Vector2DF(0.0f, Joystick.GetAxisState(1) * 4.0f);
             if (Joystick.GetAxisState(1) < 0.0f)
             {
-                Speed -= 0.1f;
+                Acceleration -= 0.05f;
             }
-            else if (Joystick.GetAxisState(1) > 0.5f)
+            else if (Joystick.GetAxisState(1) > 0.1f)
             {
-                Speed += 0.1f;
+                Acceleration += 0.05f;
             }
+            else
+            {
+                Acceleration = 0;
+            }
+
+            Speed += Acceleration;
 
             ShapeOfCollige.Position = Position;
 
-            Speed += 0.001f;
+            //MaxSpeed += 0.001f;
+            //MinSpeed += 0.001f;
+            //Speed += 0.001f;
+
+            if (Position.Y < 25.0f) Position = new asd.Vector2DF(Position.X,25.0f);
+            Angle = velocity.Degree;
+
             base.OnUpdate();
         }
 

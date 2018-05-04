@@ -4,6 +4,7 @@ namespace KAMI_HIKOKI
     public class Rain : asd.TextureObject2D
     {
         static asd.Texture2D TextureOfRain;
+        public float YLimit { set; get; }
 
         //共通初期化
         public static bool Init()
@@ -34,7 +35,7 @@ namespace KAMI_HIKOKI
             ShapeOfCollige.Position = Position;
             base.OnUpdate();
 
-            if (Position.Y > 650.0f) Dispose();
+            if (Position.Y > 650.0f || Position.Y > YLimit) Dispose();
         }
     }
 }
