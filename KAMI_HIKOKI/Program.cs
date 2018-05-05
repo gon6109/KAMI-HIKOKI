@@ -42,6 +42,8 @@ namespace KAMI_HIKOKI
             if (!Wall.Init()) return false;
             if (!Cloud.Init()) return false;
             if (!Rain.Init()) return false;
+            if (!Healer.Init()) return false;
+            if (!Wind.Init()) return false;
                 
             Game = new GameMgr();
             asd.Engine.ChangeScene(Game);

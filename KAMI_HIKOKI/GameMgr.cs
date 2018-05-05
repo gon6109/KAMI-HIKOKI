@@ -21,33 +21,43 @@ namespace KAMI_HIKOKI
 
         //プロパティ
         public asd.Layer2D LayerOfBackGround { set; get; }//背景
+        public asd.Layer2D LayerOfBackGround_A { set; get; }//背動
+        public asd.CameraObject2D CameraOfBackGround_A { set; get; }//メインカメラ
         public asd.Layer2D LayerOfMain { set; get; }//スクロールするレイヤー
         public asd.CameraObject2D CameraOfMain { set; get; }//メインカメラ
         public asd.Layer2D LayerOfStatus { set; get; }//ステータス
         public asd.Layer2D LayerOfGameOver { set; get; }//ゲームオーバー
 
         public asd.TextureObject2D BackGround { set; get; }//背景
+        public asd.MapObject2D BackGround_A { set; get; }//背動
         public Player Airplane { set; get; }//自機
         public List<Wall> Walls { set; get; }//壁
         public SortedList<float, float> PairsOfWall; //壁-雨衝突判定アクセラレータ
         public List<Cloud> Clouds { set; get; }//雲
         public List<Rain> Rains { set; get; }//雨
+        public List<Healer> Healers { set; get; }//回復
+        public List<Wind> Winds { set; get; }//風
         public asd.GeometryObject2D HPBar { set; get; }//HPバー
         public asd.RectangleShape BoxOfHPBar { set; get; }
         public const int WidthOfHPBar = 500;
         public asd.TextObject2D TextOfHP { set; get; }//テキスト「HP」
+        public asd.TextObject2D TextOfScore { set; get; }//テキスト「Score」
         public asd.TextObject2D TextOfGameOver { set; get; }//テキスト「Game Over」
         public int CountOfGameOver;//ゲームオーバー用カウンタ
 
         public int Level { set; get; }
+        public int Score { set; get; }
         public int Count { set; get; }
 
         public GameMgr()
         {
+
             //レイヤー登録
             {
                 LayerOfBackGround = new asd.Layer2D();
                 AddLayer(LayerOfBackGround);
+                LayerOfBackGround_A = new asd.Layer2D();
+                AddLayer(LayerOfBackGround_A);
                 LayerOfMain = new asd.Layer2D();
                 AddLayer(LayerOfMain);
                 CameraOfMain = new asd.CameraObject2D();
@@ -65,6 +75,20 @@ namespace KAMI_HIKOKI
                 BackGround = new asd.TextureObject2D();
                 BackGround.Texture = asd.Engine.Graphics.CreateTexture2D("./Resource/Image/BackGround.png");
                 LayerOfBackGround.AddObject(BackGround);
+
+                BackGround_A = new asd.MapObject2D();
+                for (int i = 0; i < 200; i++)
+                {
+                    asd.Chip2D chip = new asd.Chip2D();
+                    chip.Texture = asd.Engine.Graphics.CreateTexture2D("./Resource/Image/Back_A.png");
+                    chip.Position = new asd.Vector2DF(i * 640.0f, 0.0f);
+                    BackGround_A.AddChip(chip);
+                }
+                CameraOfBackGround_A = new asd.CameraObject2D();
+                CameraOfBackGround_A.Src = new asd.RectI(0, 0, 640, 480);
+                CameraOfBackGround_A.Dst = new asd.RectI(0, 0, 640, 480);
+                LayerOfBackGround_A.AddObject(BackGround_A);
+                LayerOfBackGround_A.AddObject(CameraOfBackGround_A);
             }
 
             //メイン
@@ -74,6 +98,8 @@ namespace KAMI_HIKOKI
                 Walls = new List<Wall>();
                 Clouds = new List<Cloud>();
                 Rains = new List<Rain>();
+                Healers = new List<Healer>();
+                Winds = new List<Wind>();
             }
 
             //ステータス
@@ -90,8 +116,14 @@ namespace KAMI_HIKOKI
                 TextOfHP.CenterPosition = TextOfHP.Font.CalcTextureSize(TextOfHP.Text, asd.WritingDirection.Horizontal).To2DF() / 2.0f;
                 TextOfHP.Position = new asd.Vector2DF(70.0f, 450.0f);
 
+                TextOfScore = new asd.TextObject2D();
+                TextOfScore.Font = asd.Engine.Graphics.CreateDynamicFont("", 20, new asd.Color(0, 0, 0), 0, new asd.Color(0, 0, 0));
+                TextOfScore.Text = "SCORE : 0";
+                TextOfScore.Position = new asd.Vector2DF(10.0f, 10.0f);
+
                 LayerOfStatus.AddObject(HPBar);
                 LayerOfStatus.AddObject(TextOfHP);
+                LayerOfStatus.AddObject(TextOfScore);
             }
 
             //ゲームオーバー
@@ -111,8 +143,24 @@ namespace KAMI_HIKOKI
             PairsOfWall = new SortedList<float, float>();
             Level = 1;
             Count = 0;
+            Score = 0;
             //LoadMap("./Resource/MapData/Map.csv");
             MakeMap(100.0f);
+
+
+            //// 音声ファイルを読み込む。BGMの場合、第２引数を false に設定することで、再生しながらファイルを解凍することが推奨されている。
+            //asd.SoundSource bgm1 = asd.Engine.Sound.CreateSoundSource("PaperPlane_Stage0.wav", false);
+
+            //// 音声のループを有効にする。
+            //bgm1.IsLoopingMode = true;
+
+            //// 音声のループ始端を1秒に、ループ終端を6秒に設定する。
+            //bgm1.LoopStartingPoint = 15.0f;
+            //bgm1.LoopEndPoint = 714.0f;
+
+            //// 音声を再生する。
+            //int id_bgm1 = asd.Engine.Sound.Play(bgm1);
+
         }
 
         //更新１
@@ -121,21 +169,29 @@ namespace KAMI_HIKOKI
             //雨生成
             GenerateRain();
 
+            //風Moveイベント
+            StartWindMove();
+
             base.OnUpdating();
+
+            if (LayerOfBackGround_A.IsUpdated == true) CameraOfBackGround_A.Src = new asd.RectI(CameraOfBackGround_A.Src.X + 3, 0, 640, 480);
         }
 
         //更新２
         protected override void OnUpdated()
         {
             //カメラ
-            if (Airplane.Position.X > asd.Engine.WindowSize.X / 2)
-                CameraOfMain.Src = new asd.RectI(Convert.ToInt32(Airplane.Position.X) - asd.Engine.WindowSize.X / 2, 0, asd.Engine.WindowSize.X, asd.Engine.WindowSize.Y);
+            if (Airplane.Position.X > asd.Engine.WindowSize.X / 2 - 150)
+                CameraOfMain.Src = new asd.RectI(Convert.ToInt32(Airplane.Position.X) - asd.Engine.WindowSize.X / 2 + 150, 0, asd.Engine.WindowSize.X, asd.Engine.WindowSize.Y);
 
             //衝突判定
-            //Collige();
+            Collige();
 
             //HPバー
             BoxOfHPBar.DrawingArea = new asd.RectF(120, 440, (float)Airplane.HP / (float)Airplane.MaxHP * (float)WidthOfHPBar, 20);
+
+            //スコア
+            TextOfScore.Text = "SCORE : " + Score.ToString();
 
             //マップ生成
             if ((Convert.ToInt32(Airplane.Position.X) - 100) % MakeMapSize > MakeMapSize - MakeMapSize * 0.8f && 100 + (Level - 1) * MakeMapSize < Airplane.Position.X)
@@ -148,9 +204,10 @@ namespace KAMI_HIKOKI
             if (Airplane.HP == 0) GameOver();
 
             //オブジェクト破棄
-            if (Count % 5 == 0) DisposeObject();
+            DisposeObject();
 
             Count++;
+            if (LayerOfMain.IsUpdated) Score++;
 
             base.OnUpdated();
         }
@@ -230,8 +287,14 @@ namespace KAMI_HIKOKI
                     countOfCloud = 1;
                 }
 
-                //壁
-                if (temp < Level * 8 || countOfCloud > 0)
+                temp = random.Next() % 1000;
+
+                //固定系
+                if (temp < 8 + Level * 2)
+                {
+                    CreateObject(new asd.Vector2DF(x + i * Wall.TextureOfWall.Size.X + Wall.TextureOfWall.Size.X / 2.0f, random.Next() % 5 * 50 + 155.0f), 5);
+                }
+                else if (temp < Level * 8 || countOfCloud > 0)
                 {
                     CreateObject(new asd.Vector2DF(x + i * Wall.TextureOfWall.Size.X + Wall.TextureOfWall.Size.X / 2.0f, random.Next() % 5 * 50 + 155.0f), 0);
                 }
@@ -242,6 +305,15 @@ namespace KAMI_HIKOKI
                         CreateObject(new asd.Vector2DF(x + i * Wall.TextureOfWall.Size.X + Wall.TextureOfWall.Size.X / 2.0f, random.Next() % 7 * 50 + 105.0f), 0);
                     }
                 }
+
+                temp = random.Next() % 1000;
+
+                //風
+                if (temp < Level * 16)
+                {
+                    CreateObject(new asd.Vector2DF(x + i * Wall.TextureOfWall.Size.X + Wall.TextureOfWall.Size.X / 2.0f, random.Next() % 5 * 50 + 155.0f), 6);
+                }
+
                 countOfCloud--;
             }
         }
@@ -269,6 +341,14 @@ namespace KAMI_HIKOKI
                     LayerOfMain.AddObject(Clouds[Clouds.Count - 1]);
                     break;
                 case 4:
+                    break;
+                case 5:
+                    Healers.Add(new Healer(position));
+                    LayerOfMain.AddObject(Healers[Healers.Count - 1]);
+                    break;
+                case 6:
+                    Winds.Add(new Wind(position));
+                    LayerOfMain.AddObject(Winds[Winds.Count - 1]);
                     break;
             }
         }
@@ -312,6 +392,16 @@ namespace KAMI_HIKOKI
             }
 
             foreach (var item in Walls)
+            {
+                Airplane.ColligeWith(item as asd.Object2D);
+            }
+
+            foreach (var item in Healers)
+            {
+                Airplane.ColligeWith(item as asd.Object2D);
+            }
+
+            foreach (var item in Winds)
             {
                 Airplane.ColligeWith(item as asd.Object2D);
             }
@@ -387,12 +477,56 @@ namespace KAMI_HIKOKI
                     i--;
                 }
             }
+
+            for (int i = 0; i < Healers.Count; i++)
+            {
+                if (Healers[i].Position.X < CameraOfMain.Src.Position.X - 300.0f)
+                {
+                    Healers[i].Dispose();
+                    Healers.RemoveAt(i);
+                    if (Healers.Count == i) break;
+                    i--;
+                }
+                else if (!Healers[i].IsAlive)
+                {
+                    Healers.RemoveAt(i);
+                    if (Healers.Count == i) break;
+                    i--;
+                }
+            }
+
+            for (int i = 0; i < Winds.Count; i++)
+            {
+                if (Winds[i].Position.X < CameraOfMain.Src.Position.X - 300.0f)
+                {
+                    Winds[i].Dispose();
+                    Winds.RemoveAt(i);
+                    if (Winds.Count == i) break;
+                    i--;
+                }
+                else if (!Winds[i].IsAlive)
+                {
+                    Winds.RemoveAt(i);
+                    if (Winds.Count == i) break;
+                    i--;
+                }
+            }
+        }
+
+        //風
+        void StartWindMove()
+        {
+            foreach (var item in Winds)
+            {
+                if (item.Position.X < CameraOfMain.Src.Position.X + CameraOfMain.Src.Width + 30.0f) item.IsMove = true;
+            }
         }
 
         //ゲームオーバー処理
         void GameOver()
         {
             LayerOfMain.IsUpdated = false;
+            LayerOfBackGround_A.IsUpdated = false;
             if (CountOfGameOver == 0)
             {
                 AddLayer(LayerOfGameOver);

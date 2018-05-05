@@ -36,6 +36,7 @@
     <Compile Include="Rain.cs" />
     <Compile Include="Wind.cs" />
     <Compile Include="GameMgr.cs" />
+    <Compile Include="Healer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

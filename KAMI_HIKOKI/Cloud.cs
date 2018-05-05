@@ -63,8 +63,8 @@ namespace KAMI_HIKOKI
             base.OnUpdate();
         }
 
-        //雨生成
-        public Rain GenerateRain()
+		//雨生成
+		public Rain GenerateRain()
         {
             if (SizeOfCloud == TypeOfCloud.Small && Count % 2 != 0) return null;
 
