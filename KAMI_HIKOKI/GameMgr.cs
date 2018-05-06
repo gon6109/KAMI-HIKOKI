@@ -45,6 +45,9 @@ namespace KAMI_HIKOKI
         public asd.TextObject2D TextOfGameOver { set; get; }//テキスト「Game Over」
         public int CountOfGameOver;//ゲームオーバー用カウンタ
 
+        public asd.SoundSource BGM { set; get; }
+        int id_BGM;
+
         public int Level { set; get; }
         public int Score { set; get; }
         public int Count { set; get; }
@@ -147,24 +150,22 @@ namespace KAMI_HIKOKI
             //LoadMap("./Resource/MapData/Map.csv");
             MakeMap(100.0f);
 
+            // 音声ファイルを読み込む。BGMの場合、第２引数を false に設定することで、再生しながらファイルを解凍することが推奨されている。
+            BGM = asd.Engine.Sound.CreateSoundSource("./Resource/Sound/PaperPlane_Stage0.ogg", false);
 
-            //// 音声ファイルを読み込む。BGMの場合、第２引数を false に設定することで、再生しながらファイルを解凍することが推奨されている。
-            //asd.SoundSource bgm1 = asd.Engine.Sound.CreateSoundSource("PaperPlane_Stage0.wav", false);
+            // 音声のループを有効にする。
+            BGM.IsLoopingMode = true;
 
-            //// 音声のループを有効にする。
-            //bgm1.IsLoopingMode = true;
+            // 音声のループ始端を1秒に、ループ終端を6秒に設定する。
+            BGM.LoopStartingPoint = 2.0f;
+            BGM.LoopEndPoint = 15.714f;
 
-            //// 音声のループ始端を1秒に、ループ終端を6秒に設定する。
-            //bgm1.LoopStartingPoint = 15.0f;
-            //bgm1.LoopEndPoint = 714.0f;
-
-            //// 音声を再生する。
-            //int id_bgm1 = asd.Engine.Sound.Play(bgm1);
-
+            // 音声を再生する。
+            id_BGM = asd.Engine.Sound.Play(BGM);
         }
 
-        //更新１
-        protected override void OnUpdating()
+		//更新１
+		protected override void OnUpdating()
         {
             //雨生成
             GenerateRain();
