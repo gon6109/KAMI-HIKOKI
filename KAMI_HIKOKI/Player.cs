@@ -65,13 +65,27 @@ namespace KAMI_HIKOKI
         protected override void OnUpdate()
         {
             //上昇・下降
-            if (Joystick.GetAxisState(1) < 0.0f)
+            if (!asd.Engine.JoystickContainer.GetIsPresentAt(0))
             {
-                Speed += new asd.Vector2DF(-0.05f, -0.2f);
+                if (asd.Engine.Keyboard.GetKeyState(asd.Keys.Up) == asd.KeyState.Hold)
+                {
+                    Speed += new asd.Vector2DF(-0.05f, -0.2f);
+                }
+                else if (asd.Engine.Keyboard.GetKeyState(asd.Keys.Down) == asd.KeyState.Hold)
+                {
+                    Speed += new asd.Vector2DF(0.05f, 0.2f);
+                }
             }
-            else if (Joystick.GetAxisState(1) > 0.1f)
+            else
             {
-                Speed += new asd.Vector2DF(0.05f, 0.2f);
+                if (Joystick.GetAxisState(1) < 0.0f)
+                {
+                    Speed += new asd.Vector2DF(-0.05f, -0.2f);
+                }
+                else if (Joystick.GetAxisState(1) > 0.1f)
+                {
+                    Speed += new asd.Vector2DF(0.05f, 0.2f);
+                }
             }
 
             if (WindCount > 0) 

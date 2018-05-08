@@ -41,12 +41,62 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Altseed">
-      <HintPath>..\packages\AltseedDotNet.1.1.0.2\lib\net45\Altseed.dll</HintPath>
+      <HintPath>Altseed.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="Altseed.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Altseed.XML" />
+    <None Include="libAltseed_core.dylib">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Altseed_core.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resource\.DS_Store" />
+    <None Include="Resource\Image\.DS_Store" />
+    <None Include="Resource\Image\Airplane.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resource\Image\BackGround.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resource\Image\Back_A.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resource\Image\Cloud_L.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resource\Image\Cloud_M.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resource\Image\Cloud_S.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resource\Image\Heal.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resource\Image\Rain.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resource\Image\Wall.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resource\Image\Wind.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resource\Image\Wind_A.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resource\MapData\Map.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resource\Sound\PaperPlane_Stage0.ogg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resource\Sound\PaperPlane_Stage0.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\AltseedDotNet.1.1.0.2\build\net45\AltseedDotNet.targets" Condition="Exists('..\packages\AltseedDotNet.1.1.0.2\build\net45\AltseedDotNet.targets')" />
 </Project>

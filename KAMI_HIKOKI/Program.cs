@@ -38,7 +38,6 @@ namespace KAMI_HIKOKI
         static bool Init()
         {
             if (!asd.Engine.Initialize("KAMI_HIKOKI", 640, 480, new asd.EngineOption())) return false;
-            if (!asd.Engine.JoystickContainer.GetIsPresentAt(0)) return false;
             if (!Wall.Init()) return false;
             if (!Cloud.Init()) return false;
             if (!Rain.Init()) return false;

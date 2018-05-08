@@ -162,6 +162,7 @@ namespace KAMI_HIKOKI
 
             // 音声を再生する。
             id_BGM = asd.Engine.Sound.Play(BGM);
+
         }
 
 		//更新１
@@ -213,8 +214,15 @@ namespace KAMI_HIKOKI
             base.OnUpdated();
         }
 
-        //マップロード
-        public void LoadMap(string path)
+		//破棄処理
+		protected override void OnDispose()
+		{
+            asd.Engine.Sound.Stop(id_BGM);
+            base.OnDispose();
+		}
+
+		//マップロード
+		public void LoadMap(string path)
         {
             StreamReader file = new StreamReader(path, Encoding.Default);
 
