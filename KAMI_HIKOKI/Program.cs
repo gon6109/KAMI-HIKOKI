@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Text;
 namespace KAMI_HIKOKI
 {
     public class Program
@@ -9,7 +11,7 @@ namespace KAMI_HIKOKI
         [STAThread]
         static void Main(string[] args)
         {
-            
+
             //初期化
             if (!Init())
             {
@@ -25,7 +27,8 @@ namespace KAMI_HIKOKI
                 //リスタート
                 if (!Game.IsAlive)
                 {
-                    Game = new GameMgr();
+                    int best = Game.BestScore;
+                    Game = new GameMgr(best, true);
                     asd.Engine.ChangeScene(Game);
                 }
             }
@@ -43,8 +46,20 @@ namespace KAMI_HIKOKI
             if (!Rain.Init()) return false;
             if (!Healer.Init()) return false;
             if (!Wind.Init()) return false;
-                
-            Game = new GameMgr();
+
+            int best = 0;
+            try
+            {
+                StreamReader file = new StreamReader("Score", Encoding.Default);
+                best = Convert.ToInt32(file.ReadLine());
+                file.Close();
+            }
+            catch
+            {
+                System.Diagnostics.Debug.Write("Error");
+            }
+
+            Game = new GameMgr(best,false);
             asd.Engine.ChangeScene(Game);
 
             return true;
@@ -53,6 +68,10 @@ namespace KAMI_HIKOKI
         //終了処理
         static void End()
         {
+            StreamWriter file = new StreamWriter("Score");
+            file.WriteLine(Game.BestScore);
+            file.Close();
+
             asd.Engine.Terminate();
         }
     }

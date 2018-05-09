@@ -26,6 +26,7 @@ namespace KAMI_HIKOKI
         public asd.Layer2D LayerOfMain { set; get; }//スクロールするレイヤー
         public asd.CameraObject2D CameraOfMain { set; get; }//メインカメラ
         public asd.Layer2D LayerOfStatus { set; get; }//ステータス
+        public asd.Layer2D LayerOfStart { set; get; }//スタート画面
         public asd.Layer2D LayerOfGameOver { set; get; }//ゲームオーバー
 
         public asd.TextureObject2D BackGround { set; get; }//背景
@@ -37,11 +38,15 @@ namespace KAMI_HIKOKI
         public List<Rain> Rains { set; get; }//雨
         public List<Healer> Healers { set; get; }//回復
         public List<Wind> Winds { set; get; }//風
+        public asd.GeometryObject2D BestScoreLine { set; get; }
+        public asd.RectangleShape BoxOfBestScore { set; get; }//ゴールライン
         public asd.GeometryObject2D HPBar { set; get; }//HPバー
         public asd.RectangleShape BoxOfHPBar { set; get; }
         public const int WidthOfHPBar = 500;
         public asd.TextObject2D TextOfHP { set; get; }//テキスト「HP」
         public asd.TextObject2D TextOfScore { set; get; }//テキスト「Score」
+        public asd.TextObject2D TextOfTitle { set; get; }//タイトル
+        public asd.TextObject2D TextOfPAK { set; get; }//テキスト「Press Any Key」
         public asd.TextObject2D TextOfGameOver { set; get; }//テキスト「Game Over」
         public int CountOfGameOver;//ゲームオーバー用カウンタ
 
@@ -50,9 +55,11 @@ namespace KAMI_HIKOKI
 
         public int Level { set; get; }
         public int Score { set; get; }
+        public int BestScore { set; get; }
         public int Count { set; get; }
+        public bool IsRestart { get; }
 
-        public GameMgr()
+        public GameMgr(int bestscore, bool isrestart)
         {
 
             //レイヤー登録
@@ -98,6 +105,13 @@ namespace KAMI_HIKOKI
             {
                 Airplane = new Player();
                 LayerOfMain.AddObject(Airplane);
+                BestScoreLine = new asd.GeometryObject2D();
+                BoxOfBestScore = new asd.RectangleShape();
+                BoxOfBestScore.DrawingArea = new asd.RectF(bestscore * 50.0f, 0, 5, 480);
+                BestScoreLine.Shape = BoxOfBestScore;
+                BestScoreLine.Color = new asd.Color(255, 255, 0);
+                BestScoreLine.DrawingPriority = 3;
+                LayerOfMain.AddObject(BestScoreLine);
                 Walls = new List<Wall>();
                 Clouds = new List<Cloud>();
                 Rains = new List<Rain>();
@@ -111,22 +125,40 @@ namespace KAMI_HIKOKI
                 BoxOfHPBar = new asd.RectangleShape();
                 BoxOfHPBar.DrawingArea = new asd.RectF(120, 440, Airplane.HP / Airplane.MaxHP * WidthOfHPBar, 20);
                 HPBar.Shape = BoxOfHPBar;
-                HPBar.Color = new asd.Color(255, 0, 0);
+                HPBar.Color = new asd.Color(255, 255, 255, 100);
 
                 TextOfHP = new asd.TextObject2D();
-                TextOfHP.Font = asd.Engine.Graphics.CreateDynamicFont("", 20, new asd.Color(255, 0, 0), 0, new asd.Color(255, 0, 0));
+                TextOfHP.Font = asd.Engine.Graphics.CreateDynamicFont("", 20, new asd.Color(255, 255, 255, 100), 0, new asd.Color(255, 255, 255, 100));
                 TextOfHP.Text = "HP";
+                TextOfHP.Color = new asd.Color(255, 255, 255, 100);
                 TextOfHP.CenterPosition = TextOfHP.Font.CalcTextureSize(TextOfHP.Text, asd.WritingDirection.Horizontal).To2DF() / 2.0f;
                 TextOfHP.Position = new asd.Vector2DF(70.0f, 450.0f);
 
                 TextOfScore = new asd.TextObject2D();
-                TextOfScore.Font = asd.Engine.Graphics.CreateDynamicFont("", 20, new asd.Color(0, 0, 0), 0, new asd.Color(0, 0, 0));
+                TextOfScore.Font = asd.Engine.Graphics.CreateDynamicFont("", 20, new asd.Color(255, 255, 255), 0, new asd.Color(0, 0, 0));
                 TextOfScore.Text = "SCORE : 0";
                 TextOfScore.Position = new asd.Vector2DF(10.0f, 10.0f);
 
                 LayerOfStatus.AddObject(HPBar);
                 LayerOfStatus.AddObject(TextOfHP);
                 LayerOfStatus.AddObject(TextOfScore);
+            }
+
+            //スタート
+            {
+                LayerOfStart = new asd.Layer2D();
+                TextOfTitle = new asd.TextObject2D();
+                TextOfTitle.Font = asd.Engine.Graphics.CreateDynamicFont("", 60, new asd.Color(255, 255, 255), 0, new asd.Color(255, 255, 255));
+                TextOfTitle.Text = "KAMI HIKOKI";
+                TextOfTitle.CenterPosition = TextOfTitle.Font.CalcTextureSize(TextOfTitle.Text, asd.WritingDirection.Horizontal).To2DF() / 2.0f;
+                TextOfTitle.Position = new asd.Vector2DF(asd.Engine.WindowSize.X / 2.0f, asd.Engine.WindowSize.Y / 2.0f);
+                TextOfPAK = new asd.TextObject2D();
+                TextOfPAK.Font = asd.Engine.Graphics.CreateDynamicFont("", 20, new asd.Color(255, 255, 255), 0, new asd.Color(255, 255, 255));
+                TextOfPAK.Text = "Press Any Key";
+                TextOfPAK.CenterPosition = TextOfPAK.Font.CalcTextureSize(TextOfPAK.Text, asd.WritingDirection.Horizontal).To2DF() / 2.0f;
+                TextOfPAK.Position = new asd.Vector2DF(asd.Engine.WindowSize.X / 2.0f, 430);
+                LayerOfStart.AddObject(TextOfTitle);
+                LayerOfStart.AddObject(TextOfPAK);
             }
 
             //ゲームオーバー
@@ -147,27 +179,46 @@ namespace KAMI_HIKOKI
             Level = 1;
             Count = 0;
             Score = 0;
+            BestScore = bestscore;
+            IsRestart = isrestart;
+
+            if (!IsRestart)
+            {
+                AddLayer(LayerOfStart);
+                LayerOfStatus.IsDrawn = false;
+                LayerOfMain.IsUpdated = false;
+                LayerOfBackGround_A.IsUpdated = false;
+            }
+            else
+            {
+                LayerOfStart.IsUpdated = false;
+
+                // 音声ファイルを読み込む。BGMの場合、第２引数を false に設定することで、再生しながらファイルを解凍することが推奨されている。
+                BGM = asd.Engine.Sound.CreateSoundSource("./Resource/Sound/PaperPlane_Stage0.ogg", false);
+
+                // 音声のループを有効にする。
+                BGM.IsLoopingMode = true;
+
+                // 音声のループ始端を1秒に、ループ終端を6秒に設定する。
+                BGM.LoopStartingPoint = 2.0f;
+                BGM.LoopEndPoint = 15.714f;
+
+                // 音声を再生する。
+                id_BGM = asd.Engine.Sound.Play(BGM);
+            }
+
             //LoadMap("./Resource/MapData/Map.csv");
             MakeMap(100.0f);
-
-            // 音声ファイルを読み込む。BGMの場合、第２引数を false に設定することで、再生しながらファイルを解凍することが推奨されている。
-            BGM = asd.Engine.Sound.CreateSoundSource("./Resource/Sound/PaperPlane_Stage0.ogg", false);
-
-            // 音声のループを有効にする。
-            BGM.IsLoopingMode = true;
-
-            // 音声のループ始端を1秒に、ループ終端を6秒に設定する。
-            BGM.LoopStartingPoint = 2.0f;
-            BGM.LoopEndPoint = 15.714f;
-
-            // 音声を再生する。
-            id_BGM = asd.Engine.Sound.Play(BGM);
-
         }
 
-		//更新１
-		protected override void OnUpdating()
+        //更新１
+        protected override void OnUpdating()
         {
+            //スタート処理
+            Start();
+
+            if (LayerOfStart.IsUpdated) return;
+
             //雨生成
             GenerateRain();
 
@@ -208,62 +259,125 @@ namespace KAMI_HIKOKI
             //オブジェクト破棄
             DisposeObject();
 
-            Count++;
-            if (LayerOfMain.IsUpdated) Score++;
+            if (!LayerOfStart.IsUpdated) Count++;
+            if (LayerOfMain.IsUpdated) Score = (int)Airplane.Position.X / 50;
+            if (Score > BestScore) TextOfScore.Color = new asd.Color(255, 255, 0);
 
             base.OnUpdated();
         }
 
-		//破棄処理
-		protected override void OnDispose()
-		{
+        //破棄処理
+        protected override void OnDispose()
+        {
             asd.Engine.Sound.Stop(id_BGM);
             base.OnDispose();
-		}
+        }
 
-		//マップロード
-		public void LoadMap(string path)
+        //スタート処理
+        void Start()
         {
-            StreamReader file = new StreamReader(path, Encoding.Default);
+            if (Count > 60 || IsRestart) return;
 
-            int c = 0;
-            string str = "";
-            ReadState state = ReadState.X;
-            asd.Vector2DF pos = new asd.Vector2DF();
-            while ((c = file.Read()) != -1)
+            if (!LayerOfStart.IsUpdated && Count < 60)
             {
-                switch (c)
+                TextOfPAK.Color = new asd.Color(255, 255, 255, (int)((1.0f - Count / 60.0f) * 255.0f));
+                TextOfTitle.Color = new asd.Color(255, 255, 255, (int)((1.0f - Count / 60.0f) * 255.0f));
+                TextOfHP.Color = new asd.Color(255, 255, 255, (int)((Count / 60.0f) * 100.0f));
+                TextOfScore.Color = new asd.Color(255, 255, 255, (int)((Count / 60.0f) * 255.0f));
+                HPBar.Color = new asd.Color(255, 255, 255, (int)((Count / 60.0f) * 100.0f));
+            }
+            else if (Count == 60)
+            {
+                LayerOfStart.IsDrawn = false;
+                // 音声ファイルを読み込む。BGMの場合、第２引数を false に設定することで、再生しながらファイルを解凍することが推奨されている。
+                BGM = asd.Engine.Sound.CreateSoundSource("./Resource/Sound/PaperPlane_Stage0.ogg", false);
+
+                // 音声のループを有効にする。
+                BGM.IsLoopingMode = true;
+
+                // 音声のループ始端を1秒に、ループ終端を6秒に設定する。
+                BGM.LoopStartingPoint = 2.0f;
+                BGM.LoopEndPoint = 15.714f;
+
+                // 音声を再生する。
+                id_BGM = asd.Engine.Sound.Play(BGM);
+            }
+            else
+            {
+                if (!asd.Engine.JoystickContainer.GetIsPresentAt(0))
                 {
-                    case '/':
-                        file.ReadLine();
-                        str = "";
-                        break;
-                    case ',':
-                        switch (state)
-                        {
-                            case ReadState.X:
-                                pos.X = Convert.ToSingle(str);
-                                state = ReadState.Y;
-                                break;
-                            case ReadState.Y:
-                                pos.Y = Convert.ToSingle(str);
-                                state = ReadState.Object;
-                                break;
-                        }
-                        str = "";
-                        break;
-                    case '\n':
-                        CreateObject(pos, Convert.ToInt32(str));
-                        state = ReadState.X;
-                        str = "";
-                        break;
-                    default:
-                        str += Convert.ToChar(c);
-                        break;
+                    if (asd.Engine.Keyboard.GetKeyState(asd.Keys.Up) == asd.KeyState.Push || asd.Engine.Keyboard.GetKeyState(asd.Keys.Down) == asd.KeyState.Push)
+                    {
+                        LayerOfStart.IsUpdated = false;
+                        LayerOfMain.IsUpdated = true;
+                        LayerOfStatus.IsDrawn = true;
+                        LayerOfBackGround_A.IsUpdated = true;
+                    }
+                }
+                else
+                {
+                    var Joystick = asd.Engine.JoystickContainer.GetJoystickAt(0);
+                    if (Joystick.GetAxisState(1) < -0.5f || Joystick.GetAxisState(1) > 0.5f)
+                    {
+                        LayerOfStart.IsUpdated = false;
+                        LayerOfMain.IsUpdated = true;
+                        LayerOfStatus.IsDrawn = true;
+                        LayerOfBackGround_A.IsUpdated = true;
+                    }
                 }
             }
-            CreateObject(pos, Convert.ToInt32(str));
-            file.Close();
+        }
+
+        //マップロード
+        public void LoadMap(string path)
+        {
+            try
+            {
+                StreamReader file = new StreamReader(path, Encoding.Default);
+
+                int c = 0;
+                string str = "";
+                ReadState state = ReadState.X;
+                asd.Vector2DF pos = new asd.Vector2DF();
+                while ((c = file.Read()) != -1)
+                {
+                    switch (c)
+                    {
+                        case '/':
+                            file.ReadLine();
+                            str = "";
+                            break;
+                        case ',':
+                            switch (state)
+                            {
+                                case ReadState.X:
+                                    pos.X = Convert.ToSingle(str);
+                                    state = ReadState.Y;
+                                    break;
+                                case ReadState.Y:
+                                    pos.Y = Convert.ToSingle(str);
+                                    state = ReadState.Object;
+                                    break;
+                            }
+                            str = "";
+                            break;
+                        case '\n':
+                            CreateObject(pos, Convert.ToInt32(str));
+                            state = ReadState.X;
+                            str = "";
+                            break;
+                        default:
+                            str += Convert.ToChar(c);
+                            break;
+                    }
+                }
+                CreateObject(pos, Convert.ToInt32(str));
+                file.Close();
+            }
+            catch
+            {
+                System.Diagnostics.Debug.Write("Error");
+            }
         }
 
         //マップ生成
@@ -538,6 +652,12 @@ namespace KAMI_HIKOKI
             LayerOfBackGround_A.IsUpdated = false;
             if (CountOfGameOver == 0)
             {
+                if (Score > BestScore)
+                {
+                    TextOfGameOver.Text = "New High Score";
+                    TextOfGameOver.Font = asd.Engine.Graphics.CreateDynamicFont("", 80, new asd.Color(255, 255, 0), 0, new asd.Color(255, 255, 0));
+                    TextOfGameOver.CenterPosition = TextOfGameOver.Font.CalcTextureSize(TextOfGameOver.Text, asd.WritingDirection.Horizontal).To2DF() / 2.0f;
+                }
                 AddLayer(LayerOfGameOver);
             }
             if (CountOfGameOver < 120)
@@ -546,6 +666,7 @@ namespace KAMI_HIKOKI
             }
             else if (CountOfGameOver == 150)
             {
+                if (Score > BestScore) BestScore = Score;
                 Dispose();
             }
             CountOfGameOver++;
