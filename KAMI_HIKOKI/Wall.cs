@@ -8,7 +8,7 @@ namespace KAMI_HIKOKI
         //共通初期化
         public static bool Init()
         {
-            TextureOfWall = asd.Engine.Graphics.CreateTexture2D("./Resource/Image/Wall.png");
+            TextureOfWall = asd.Engine.Graphics.CreateTexture2D("Image/Wall.png");
             if (TextureOfWall == null) return false;
             return true;
         }

@@ -42,7 +42,7 @@ namespace KAMI_HIKOKI
 
         public Player()
         {
-            Texture = asd.Engine.Graphics.CreateTexture2D("./Resource/Image/Airplane.png");
+            Texture = asd.Engine.Graphics.CreateTexture2D("Image/Airplane.png");
             CenterPosition = Texture.Size.To2DF() / 2.0f;
             Joystick = asd.Engine.JoystickContainer.GetJoystickAt(0);
 

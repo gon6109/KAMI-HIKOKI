@@ -18,9 +18,9 @@ namespace KAMI_HIKOKI
         //共通初期化
         public static bool Init()
         {
-            TextureOfCloud_S = asd.Engine.Graphics.CreateTexture2D("./Resource/Image/Cloud_S.png");
-            TextureOfCloud_M = asd.Engine.Graphics.CreateTexture2D("./Resource/Image/Cloud_M.png");
-            TextureOfCloud_L = asd.Engine.Graphics.CreateTexture2D("./Resource/Image/Cloud_L.png");
+            TextureOfCloud_S = asd.Engine.Graphics.CreateTexture2D("Image/Cloud_S.png");
+            TextureOfCloud_M = asd.Engine.Graphics.CreateTexture2D("Image/Cloud_M.png");
+            TextureOfCloud_L = asd.Engine.Graphics.CreateTexture2D("Image/Cloud_L.png");
             if (TextureOfCloud_S == null || TextureOfCloud_M == null || TextureOfCloud_L == null) return false;
             return true;
         }

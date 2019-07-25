@@ -41,6 +41,9 @@ namespace KAMI_HIKOKI
         static bool Init()
         {
             if (!asd.Engine.Initialize("KAMI_HIKOKI", 640, 480, new asd.EngineOption())) return false;
+
+            asd.Engine.File.AddRootPackageWithPassword("Resource.pack","god");
+
             if (!Wall.Init()) return false;
             if (!Cloud.Init()) return false;
             if (!Rain.Init()) return false;

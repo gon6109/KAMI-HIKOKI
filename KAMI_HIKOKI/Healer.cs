@@ -11,7 +11,7 @@ namespace KAMI_HIKOKI
         //共通初期化
         public static bool Init()
         {
-            TextureOfHealer = asd.Engine.Graphics.CreateTexture2D("./Resource/Image/Heal.png");
+            TextureOfHealer = asd.Engine.Graphics.CreateTexture2D("Image/Heal.png");
             if (TextureOfHealer == null) return false;
             return true;
         }

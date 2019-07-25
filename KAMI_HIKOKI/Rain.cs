@@ -9,7 +9,7 @@ namespace KAMI_HIKOKI
         //共通初期化
         public static bool Init()
         {
-            TextureOfRain = asd.Engine.Graphics.CreateTexture2D("./Resource/Image/Rain.png");
+            TextureOfRain = asd.Engine.Graphics.CreateTexture2D("Image/Rain.png");
             if (TextureOfRain == null) return false;
             return true;
         }

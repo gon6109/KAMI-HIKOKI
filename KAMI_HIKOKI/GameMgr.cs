@@ -83,14 +83,14 @@ namespace KAMI_HIKOKI
             //背景
             {
                 BackGround = new asd.TextureObject2D();
-                BackGround.Texture = asd.Engine.Graphics.CreateTexture2D("./Resource/Image/BackGround.png");
+                BackGround.Texture = asd.Engine.Graphics.CreateTexture2D("Image/BackGround.png");
                 LayerOfBackGround.AddObject(BackGround);
 
                 BackGround_A = new asd.MapObject2D();
                 for (int i = 0; i < 200; i++)
                 {
                     asd.Chip2D chip = new asd.Chip2D();
-                    chip.Texture = asd.Engine.Graphics.CreateTexture2D("./Resource/Image/Back_A.png");
+                    chip.Texture = asd.Engine.Graphics.CreateTexture2D("Image/Back_A.png");
                     chip.Position = new asd.Vector2DF(i * 640.0f, 0.0f);
                     BackGround_A.AddChip(chip);
                 }
@@ -194,7 +194,7 @@ namespace KAMI_HIKOKI
                 LayerOfStart.IsUpdated = false;
 
                 // 音声ファイルを読み込む。BGMの場合、第２引数を false に設定することで、再生しながらファイルを解凍することが推奨されている。
-                BGM = asd.Engine.Sound.CreateSoundSource("./Resource/Sound/PaperPlane_Stage0.ogg", false);
+                BGM = asd.Engine.Sound.CreateSoundSource("Sound/PaperPlane_Stage0.ogg", false);
 
                 // 音声のループを有効にする。
                 BGM.IsLoopingMode = true;
@@ -207,7 +207,7 @@ namespace KAMI_HIKOKI
                 id_BGM = asd.Engine.Sound.Play(BGM);
             }
 
-            //LoadMap("./Resource/MapData/Map.csv");
+            //LoadMap("MapData/Map.csv");
             MakeMap(100.0f);
         }
 
@@ -290,7 +290,7 @@ namespace KAMI_HIKOKI
             {
                 LayerOfStart.IsDrawn = false;
                 // 音声ファイルを読み込む。BGMの場合、第２引数を false に設定することで、再生しながらファイルを解凍することが推奨されている。
-                BGM = asd.Engine.Sound.CreateSoundSource("./Resource/Sound/PaperPlane_Stage0.ogg", false);
+                BGM = asd.Engine.Sound.CreateSoundSource("Sound/PaperPlane_Stage0.ogg", false);
 
                 // 音声のループを有効にする。
                 BGM.IsLoopingMode = true;
